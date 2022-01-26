@@ -4,7 +4,6 @@ from cv2 import cv2
 from os import listdir
 from random import randint
 from random import random
-import pygetwindow
 import numpy as np
 import mss
 import pyautogui
@@ -201,13 +200,7 @@ def scroll():
 
     commoms = positions(images['commom-text'], threshold = ct['commom'])
     if (len(commoms) == 0):
-        commoms = positions(images['rare-text'], threshold = ct['rare'])
-        if (len(commoms) == 0):
-            commoms = positions(images['super_rare-text'], threshold = ct['super_rare'])
-            if (len(commoms) == 0):
-                commoms = positions(images['epic-text'], threshold = ct['epic'])
-                if (len(commoms) == 0):
-                    return
+        return
     x,y,w,h = commoms[len(commoms)-1]
 #
     moveToWithRandomness(x,y,1)
@@ -333,6 +326,11 @@ def refreshHeroesPositions():
 
     # time.sleep(3)
     clickBtn(images['treasure-hunt-icon'])
+
+def refreshGame():
+
+    logger('🔃 Refreshing game and clear cache')
+    pyautogui.hotkey('ctrl','f5')
 
 def login():
     global login_attempts
@@ -483,70 +481,52 @@ def main():
     time.sleep(7)
     t = c['time_intervals']
 
-    windows = []
+    last = {
+    "login" : 0,
+    "heroes" : 0,
+    "new_map" : 0,
+    "check_for_captcha" : 0,
+    "refresh_heroes" : 0,
+    "refresh_game" : 0
+    }
+    # =========
 
-    #  Aqui ele percorre as janelas que estiver escrito bombcrypto
-    for window in pygetwindow.getWindowsWithTitle('bombcrypto'):
-        if (window.title.count('bombcrypto-bot') >= 1):
-            continue
+    while True:
+        now = time.time()
 
-        windows.append({
-            "window": window,
-            "login": 0,
-            "heroes": 0,
-            "new_map": 0,
-            "check_for_captcha": 0,
-            "refresh_heroes": 0
-        })
+        if now - last["check_for_captcha"] > addRandomness(t['check_for_captcha'] * 60):
+            last["check_for_captcha"] = now
 
-    if len(windows) >= 1:
-        print('>>---> %d windows with the name bombcrypto were found' % len(windows))
+        if now - last["heroes"] > addRandomness(t['send_heroes_for_work'] * 60):
+            last["heroes"] = now
+            refreshHeroes()
 
-        while True:
-            for currentWindow in windows:
-                currentWindow["window"].activate()
-                if currentWindow["window"].isMaximized == False:
-                    currentWindow["window"].maximize()
+        if now - last["login"] > addRandomness(t['check_for_login'] * 60):
+            sys.stdout.flush()
+            last["login"] = now
+            login()
 
-                print('>>---> Current window: %s' % currentWindow["window"].title)
+        if now - last["new_map"] > t['check_for_new_map_button']:
+            last["new_map"] = now
 
-                time.sleep(2)
-                now = time.time()
+            if clickBtn(images['new-map']):
+                loggerMapClicked()
 
-                if clickBtn(images['ok_team_viewer'], timeout=5):
-                    pass
+        if now - last["refresh_heroes"] > addRandomness( t['refresh_heroes_positions'] * 60):
+            last["refresh_heroes"] = now
+            refreshHeroesPositions()
 
-                if now - currentWindow["check_for_captcha"] > addRandomness(t['check_for_captcha'] * 60):
-                    currentWindow["check_for_captcha"] = now
+        if now - last["refresh_game"] > addRandomness(t['refresh_global_page'] * 60):
+            last["refresh_game"] = now
+            refreshGame()
 
-                if now - currentWindow["heroes"] > addRandomness(t['send_heroes_for_work'] * 60):
-                    currentWindow["heroes"] = now
-                    refreshHeroes()
+        #clickBtn(teasureHunt)
+        logger(None, progress_indicator=True)
 
-                if now - currentWindow["login"] > addRandomness(t['check_for_login'] * 60):
-                    sys.stdout.flush()
-                    currentWindow["login"] = now
-                    login()
+        sys.stdout.flush()
 
-                if now - currentWindow["new_map"] > t['check_for_new_map_button']:
-                    currentWindow["new_map"] = now
+        time.sleep(1)
 
-                    if clickBtn(images['new-map']):
-                        loggerMapClicked()
-
-
-                if now - currentWindow["refresh_heroes"] > addRandomness( t['refresh_heroes_positions'] * 60):
-                    currentWindow["refresh_heroes"] = now
-                    refreshHeroesPositions()
-
-                #clickBtn(teasureHunt)
-                logger(None, progress_indicator=True)
-
-                sys.stdout.flush()
-
-                time.sleep(1)
-    else:
-        print('>>---> No window with the name bombcrypto was found')
 
 
 if __name__ == '__main__':

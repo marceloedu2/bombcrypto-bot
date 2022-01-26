@@ -3,6 +3,8 @@
 
 ### Smart Chain Wallet(BUSD/BNB/BCOIN):
 #### 0xbd06182D8360FB7AC1B05e871e56c76372510dDf
+or
+https://bot.cryptip.xyz/
 
 ### PIX:
   6ce2b79e-97be-4881-a882-81902e29d7ce
@@ -95,20 +97,6 @@ python3 index.py
 Assim que ele iniciar ele vai começar mandando os bonecos trabalhar. Para que ele funcione é preciso que a janela do game esteja aparecendo na sua tela.
 Ele vai constantemente checar se você foi desconectado para realizar o login novamente, e se o botão “new map” tá na tela para clicar nele.
 A cada 15 minutos ele manda todos os heróis taralharem.
-
-Ou 
-
-```
-python3 forever.py
-```
-
-Que colocara automaticamente o bot a executar de forma ininterrupta, assim caso apresente qualquer erro na execução 
-do arquivo ```index.py``` ele logo executa o comando de ```python3 index.py``` novamente.
-
-Ou
-
-Executando o arquivo ``play.bat`` podendo criar atalho do mesmo para assim poder executar o bot 
-sem precisar abrir o terminal ou a própria pasta do bot.
 
 # Send home feature:
 
